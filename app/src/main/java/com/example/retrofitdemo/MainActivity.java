@@ -1,6 +1,9 @@
 package com.example.retrofitdemo;
 
 import androidx.appcompat.app.AppCompatActivity;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -8,6 +11,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import android.os.Bundle;
+import android.os.Environment;
 import android.util.Log;
 
 import com.example.retrofitdemo.model.IpModel;
@@ -16,6 +20,8 @@ import com.example.retrofitdemo.net.IpService;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -37,7 +43,10 @@ public class MainActivity extends AppCompatActivity
                 .addConverterFactory(GsonConverterFactory.create())//增加返回值Json支持
                 .build();
         IpService ipService = retrofit.create(IpService.class);
-        Call<IpModel> call = ipService.getIpMsg();
+        File file = new File(Environment.getExternalStorageDirectory(), "wa.png");
+        RequestBody requestBody = RequestBody.create(MediaType.parse("image/png"), file);
+        MultipartBody.Part photo = MultipartBody.Part.createFormData("photos", "wanshu.png", requestBody);
+        Call<IpModel> call = ipService.updateModel(photo, RequestBody.create(null, "wa"));
         call.enqueue(new Callback<IpModel>()
         {
             @Override
@@ -67,6 +76,7 @@ public class MainActivity extends AppCompatActivity
                 .build();
         IpSercieceForPath ipService = retrofit.create(IpSercieceForPath.class);
         Call<IpModel> call = ipService.getIpMsg("http://ip.taobao.com/service");//动态链接
+
         call.enqueue(new Callback<IpModel>()
         {
             @Override
